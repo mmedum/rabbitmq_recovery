@@ -25,9 +25,30 @@ namespace publisher
                 //                      autoDelete: false,
                 //                      arguments: null);
 
+                channel.QueueDeclare(queue: "pingpongA",
+                                     durable: true,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
+
+                channel.QueueDeclare(queue: "pingpongB",
+                                     durable: false,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
+
                 //Topic
                 channel.ExchangeDeclare(exchange: "pingpong",
                                         type: "topic");
+
+                //Bind specific queues with the topics and define the routingkeys
+                channel.QueueBind(queue: "pingpongA",
+                                  exchange: "pingpong",
+                                  routingKey: "topicA");
+
+                channel.QueueBind(queue: "pingpongB",
+                                  exchange: "pingpong",
+                                  routingKey: "topicB");
                 
                 while (true)
                 {

@@ -16,18 +16,20 @@ namespace consumer
             using (var channel = connection.CreateModel())
             {
                 //Queue
-                //Declare to be certain that the queues exist
-                channel.QueueDeclare(queue: "pingpongA",
-                                     durable: true,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                //Declare to be certain that the queues exist,
+                //consider whether the publisher or consumer should
+                //create the queues
+                // channel.QueueDeclare(queue: "pingpongA",
+                //                      durable: true,
+                //                      exclusive: false,
+                //                      autoDelete: false,
+                //                      arguments: null);
 
-                channel.QueueDeclare(queue: "pingpongB",
-                                     durable: false,
-                                     exclusive: false,
-                                     autoDelete: false,
-                                     arguments: null);
+                // channel.QueueDeclare(queue: "pingpongB",
+                //                      durable: false,
+                //                      exclusive: false,
+                //                      autoDelete: false,
+                //                      arguments: null);
 
                 // var consumer = new EventingBasicConsumer(channel);
                 // consumer.Received += (model, ea) =>
@@ -48,13 +50,13 @@ namespace consumer
                 channel.ExchangeDeclare(exchange: "pingpong", type: "topic");
         
                 //Bind specific queues with the topics and define the routingkeys
-                channel.QueueBind(queue: "pingpongA",
-                                  exchange: "pingpong",
-                                  routingKey: "topicA");
+                // channel.QueueBind(queue: "pingpongA",
+                //                   exchange: "pingpong",
+                //                   routingKey: "topicA");
 
-                channel.QueueBind(queue: "pingpongB",
-                                  exchange: "pingpong",
-                                  routingKey: "topicB");
+                // channel.QueueBind(queue: "pingpongB",
+                //                   exchange: "pingpong",
+                //                   routingKey: "topicB");
 
                 //Generic consumer
                 var consumer = new EventingBasicConsumer(channel);
@@ -66,15 +68,16 @@ namespace consumer
                     Console.WriteLine(" [x] Received '{0}':'{1}'",
                                     routingKey,
                                     message);
+                    channel.BasicAck(ea.DeliveryTag, false);
                 };
 
                 //Starting the consumers for two different queues
                 channel.BasicConsume(queue: "pingpongA",
-                                 autoAck: true,
+                                 autoAck: false,
                                  consumer: consumer);
 
                 channel.BasicConsume(queue: "pingpongB",
-                                 autoAck: true,
+                                 autoAck: false,
                                  consumer: consumer);
                 Console.ReadLine();
             }
